@@ -173,3 +173,21 @@ tunnel so you get a public URL to open in a browser.
   can be embedded in Power BI/other tools or replaced entirely; the API is
   the real integration surface.
 ## final summary
+
+| Metric | Value |
+|--------|------:|
+| **XGBoost Test MAE** | 23.0716 |
+| **XGBoost Test RMSE** | 28.8028 |
+| **XGBoost Test MAPE** | 4.3506% |
+| **XGBoost Test R² Score** | 0.9869 |
+| **Baseline Electricity Cost** | 11,064,925.54 |
+| **RL Optimized Cost** | 10,989,169.29 |
+| **Absolute Savings** | 75,756.25 |
+| **Percentage Savings** | 0.6847% |
+
+## 💰 Cost Optimization Summary
+
+| Before Optimization | After Optimization | Savings |
+|--------------------:|-------------------:|---------:|
+| 11,064,925.54 | 10,989,169.29 | 75,756.25 (0.6847%) |
+
