@@ -1,0 +1,123 @@
+<!--
+  backend-integration snippet
+  ----------------------------
+  Paste this <script> block right before </body> in your SYRAX index.html
+  (after your existing <script>...</script> block, so it runs second and
+  can safely wrap your existing functions).
+
+  It does NOT touch your login/OTP/avatar/settings code. It only:
+    1. Fetches real numbers from the Flask API and drops them into the
+       existing card IDs you already have (totalEnergy, batteryLevel, etc.)
+    2. Adds a Gemini-powered "AI Insights" block to the rec-list <ul>
+       elements you already have (recommendationsList, batteryRecs) by
+       calling YOUR OWN backend (/api/ai/insights) — the Gemini key never
+       reaches this file.
+
+  This version was written against the code you pasted before it got cut
+  off, so double-check the element IDs still match once you send me the
+  full file — I'll adjust this precisely once I have it.
+-->
+<script>
+const API_BASE = ""; // same-origin: Flask serves both the API and this page
+
+async function apiGet(path) {
+  const res = await fetch(API_BASE + path);
+  if (!res.ok) throw new Error(`${path} -> ${res.status}`);
+  return res.json();
+}
+async function apiPost(path, body) {
+  const res = await fetch(API_BASE + path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body || {}),
+  });
+  if (!res.ok) throw new Error(`${path} -> ${res.status}`);
+  return res.json();
+}
+
+// ---- Real data into the existing dashboard cards ----
+async function loadRealDashboardData() {
+  try {
+    const summary = await apiGet("/api/dashboard/summary");
+    const el = (id) => document.getElementById(id);
+
+    if (el("totalEnergy")) el("totalEnergy").textContent = `${summary.latest_actual_demand_kw} kW`;
+    if (el("recordCount")) el("recordCount").textContent = summary.forecast_next_24h.length;
+
+    const health = summary.battery_health;
+    if (el("batteryLevel")) {
+      el("batteryLevel").innerHTML =
+        `${Math.round(health.usable_capacity_fraction * 100)}% ` +
+        `<span class="badge ${health.fault_type === "Normal" ? "badge-green" : "badge-yellow"}">` +
+        `${health.fault_type}</span>`;
+    }
+    if (el("batteryFill")) el("batteryFill").style.width = `${Math.round(health.soh * 100)}%`;
+
+    const savings = summary.cost_savings;
+    if (el("todayCost")) el("todayCost").textContent = `₹${Math.round(savings.rl_optimized_cost).toLocaleString()}`;
+    if (el("energySaved")) el("energySaved").textContent = `${Math.round(savings.absolute_savings).toLocaleString()} units`;
+  } catch (e) {
+    console.warn("Could not load real dashboard data, keeping placeholder values:", e);
+  }
+}
+
+// ---- Real battery health into the Battery page ----
+async function loadRealBatteryData() {
+  try {
+    const data = await apiGet("/api/battery/status");
+    const el = (id) => document.getElementById(id);
+    if (el("battModel")) el("battModel").textContent = data.battery_id;
+    if (el("battSOH")) el("battSOH").textContent = (data.soh * 100).toFixed(1);
+    if (el("battVoltage")) el("battVoltage").textContent = data.voltage.toFixed(3);
+    if (el("metricSOH")) el("metricSOH").textContent = `${(data.soh * 100).toFixed(1)}%`;
+    if (el("metricRUL")) el("metricRUL").textContent = `${data.rul} cycles`;
+    if (el("faultTypeBadge")) {
+      el("faultTypeBadge").textContent = data.fault_type;
+      el("faultTypeBadge").className = "badge " + (data.fault_type === "Normal" ? "badge-green" : "badge-yellow");
+    }
+  } catch (e) {
+    console.warn("Could not load real battery data:", e);
+  }
+}
+
+// ---- Gemini insights, grounded in real backend data ----
+async function loadAIInsights(context, listElementId) {
+  const list = document.getElementById(listElementId);
+  if (!list) return;
+
+  const loadingLi = document.createElement("li");
+  loadingLi.textContent = "Generating AI insights...";
+  list.prepend(loadingLi);
+
+  try {
+    const result = await apiPost("/api/ai/insights", { context });
+    loadingLi.remove();
+    result.insights.split("\n").filter(Boolean).forEach((line) => {
+      const li = document.createElement("li");
+      li.textContent = line.replace(/^[-*]\s*/, "");
+      list.prepend(li);
+    });
+  } catch (e) {
+    loadingLi.textContent = "AI insights unavailable (check GEMINI_API_KEY on the server).";
+  }
+}
+
+// ---- Hook into page navigation without touching your showPage() ----
+document.querySelectorAll(".nav-item[data-page]").forEach((navEl) => {
+  navEl.addEventListener("click", () => {
+    const page = navEl.dataset.page;
+    if (page === "dashboard") loadRealDashboardData();
+    if (page === "battery") { loadRealBatteryData(); loadAIInsights("battery", "batteryRecs"); }
+    if (page === "predict") loadAIInsights("predict", "recommendationsList");
+  });
+});
+
+// ---- Also refresh once right after login, since goToDashboard() runs before any nav click ----
+if (typeof goToDashboard === "function") {
+  const _origGoToDashboard = goToDashboard;
+  goToDashboard = function (...args) {
+    _origGoToDashboard.apply(this, args);
+    loadRealDashboardData();
+  };
+}
+</script>

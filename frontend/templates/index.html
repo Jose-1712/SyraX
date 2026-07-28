@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SYRAX &mdash; Energy Management System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- ================= AUTH WRAPPER (LOGIN, REGISTER, FORGOT PASSWORD) ================= -->
+  <div id="authWrapper" class="auth-wrapper">
+    
+    <!-- 1. LOGIN CARD -->
+    <div id="loginCard" class="auth-card">
+      <div class="auth-header">
+        <div class="auth-brand">
+          <span class="brand-bolt">⚡</span> SYRAX
+        </div>
+        <div class="auth-subtitle">Energy Management System</div>
+        <div class="auth-title-action">USER LOGIN</div>
+      </div>
+      
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="loginUser">Username / Email</label>
+          <input type="text" id="loginUser" required placeholder="Enter username or email">
+        </div>
+        
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" required placeholder="Enter password">
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 10px;">LOGIN</button>
+      </form>
+      
+      <div class="auth-links">
+        <a href="#" onclick="showAuthCard('forgotCard')">Forgot Password?</a>
+      </div>
+      
+      <div class="auth-divider">OR</div>
+      
+      <button onclick="showAuthCard('registerCard')" class="btn btn-outline btn-block">CREATE NEW ACCOUNT</button>
+    </div>
+
+    <!-- 2. REGISTER CARD -->
+    <div id="registerCard" class="auth-card hidden">
+      <div class="auth-header">
+        <div class="auth-brand">
+          <span class="brand-bolt">⚡</span> SYRAX
+        </div>
+        <div class="auth-subtitle">Create New Account</div>
+      </div>
+      
+      <form id="registerForm" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label for="regFullName">Full Name</label>
+          <input type="text" id="regFullName" required placeholder="Enter your full name">
+        </div>
+        
+        <div class="form-group">
+          <label for="regEmail">Email</label>
+          <input type="email" id="regEmail" required placeholder="Enter your email address">
+        </div>
+        
+        <div class="form-group">
+          <label for="regUsername">Username</label>
+          <input type="text" id="regUsername" required placeholder="Choose a username">
+        </div>
+        
+        <div class="form-group">
+          <label for="regPassword">Password</label>
+          <input type="password" id="regPassword" required placeholder="Create a password">
+        </div>
+        
+        <div class="form-group">
+          <label for="regConfirmPassword">Confirm Password</label>
+          <input type="password" id="regConfirmPassword" required placeholder="Confirm your password">
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 10px;">REGISTER</button>
+      </form>
+      
+      <div class="auth-links">
+        Already have account? <a href="#" onclick="showAuthCard('loginCard')">Login</a>
+      </div>
+    </div>
+
+    <!-- 3. FORGOT PASSWORD CARD -->
+    <div id="forgotCard" class="auth-card hidden">
+      <div class="auth-header">
+        <div class="auth-subtitle">Forgot Password</div>
+        <div class="auth-title-action" style="margin-top: 5px;">Reset Your Password</div>
+      </div>
+      
+      <form id="forgotForm" onsubmit="handleResetPassword(event)">
+        <div class="form-group">
+          <label for="forgotEmail">Email</label>
+          <input type="email" id="forgotEmail" required placeholder="Enter registered email">
+        </div>
+        
+        <div class="form-group">
+          <label for="forgotOtp">OTP</label>
+          <div class="form-row-otp">
+            <input type="text" id="forgotOtp" required placeholder="Enter 6-digit OTP">
+            <button type="button" onclick="sendOtp()" class="btn btn-outline" style="padding: 8px 12px;">SEND OTP</button>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="forgotNewPass">New Password</label>
+          <input type="password" id="forgotNewPass" required placeholder="Enter new password">
+        </div>
+        
+        <div class="form-group">
+          <label for="forgotConfirmPass">Confirm Password</label>
+          <input type="password" id="forgotConfirmPass" required placeholder="Confirm new password">
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 10px;">RESET PASSWORD</button>
+      </form>
+      
+      <div class="auth-links">
+        <a href="#" onclick="showAuthCard('loginCard')">Back to Login</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= MAIN APP LAYOUT SHELL ================= -->
+  <div id="appShell" class="app-shell hidden">
+    
+    <!-- 4. SIDEBAR -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="sidebar-brand-mark">⚡</div>
+          <div>SYRAX</div>
+        </div>
+        <div class="sidebar-sub">Energy Management</div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <a onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active">
+          <span class="nav-item-icon">⚡</span> Dashboard
+        </a>
+        <a onclick="switchTab('progress')" id="nav-progress" class="nav-item">
+          <span class="nav-item-icon">📈</span> Progress
+        </a>
+        <a onclick="switchTab('predict')" id="nav-predict" class="nav-item">
+          <span class="nav-item-icon">🔮</span> Predict
+        </a>
+        <a onclick="switchTab('cost')" id="nav-cost" class="nav-item">
+          <span class="nav-item-icon">💰</span> Cost Analysis
+        </a>
+        <a onclick="switchTab('battery')" id="nav-battery" class="nav-item">
+          <span class="nav-item-icon">🔋</span> Battery Monitoring
+        </a>
+        <a onclick="switchTab('settings')" id="nav-settings" class="nav-item">
+          <span class="nav-item-icon">⚙️</span> Settings
+        </a>
+        <a onclick="showLogoutModal()" class="nav-item" style="margin-top: auto; color: var(--danger);">
+          <span class="nav-item-icon">🚪</span> Logout
+        </a>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTAINER -->
+    <main id="mainContainer" class="main-container">
+      
+      <!-- TOP HEADER -->
+      <header class="header">
+        <div class="header-title-section">
+          <h1 id="currentPageTitle">Dashboard</h1>
+        </div>
+        
+        <div class="header-right">
+          <div id="clock" class="clock">--:--:--</div>
+          <div id="apiStatus" class="api-status offline">
+            <span class="dot"></span>
+            <span class="label">connecting</span>
+          </div>
+          
+          <div class="user-profile" onclick="switchTab('settings')">
+            <div class="user-welcome">
+              <span class="user-welcome-label">Welcome</span>
+              <span id="headerUserName" class="user-name-display">User</span>
+            </div>
+            <div id="headerProfileAvatar" class="user-avatar">US</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- CONTENT AREA -->
+      <div id="contentArea" class="content-area">
+
+        <!-- 4. DASHBOARD VIEW -->
+        <div id="view-dashboard" class="view-panel">
+          <!-- 4 KPI Cards -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-card-title">Total Energy</span>
+                <span class="kpi-card-icon blue">⚡</span>
+              </div>
+              <div class="kpi-card-value" id="kpi-total-energy">-- kW</div>
+              <div class="kpi-card-subtitle">Real-time load usage</div>
+            </div>
+            
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-card-title">Battery Level</span>
+                <span class="kpi-card-icon green">🔋</span>
+              </div>
+              <div class="kpi-card-value" id="kpi-battery-level">--%</div>
+              <div class="kpi-card-subtitle">State of Charge (SoC)</div>
+            </div>
+            
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-card-title">Cost Today</span>
+                <span class="kpi-card-icon amber">₹</span>
+              </div>
+              <div class="kpi-card-value" id="kpi-cost-today">--</div>
+              <div class="kpi-card-subtitle">Accumulated grid cost</div>
+            </div>
+            
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-card-title">Saved Energy</span>
+                <span class="kpi-card-icon green">🌱</span>
+              </div>
+              <div class="kpi-card-value" id="kpi-saved-energy">--</div>
+              <div class="kpi-card-subtitle">Optimized cost savings</div>
+            </div>
+          </div>
+
+          <!-- Charts & Statistics Grid -->
+          <div class="panel-grid-2-1">
+            <div class="panel">
+              <div class="panel-title">
+                Energy Consumption Chart
+                <span class="sub-tag">XGBoost 24-Hour Forecast</span>
+              </div>
+              <div class="chart-container">
+                <canvas id="forecastChart" height="110"></canvas>
+              </div>
+              <div class="section-actions" style="margin-top: 8px;">
+                <button class="btn btn-outline" onclick="loadForecast()">🔄 Refresh Forecast</button>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-title">Quick Statistics</div>
+              <div class="quick-stats-grid">
+                <div class="quick-stat-box">
+                  <span class="quick-stat-label">Latest Actual</span>
+                  <span class="quick-stat-value" id="stat-latest-actual">-- kW</span>
+                </div>
+                <div class="quick-stat-box">
+                  <span class="quick-stat-label">Peak Forecast</span>
+                  <span class="quick-stat-value" id="stat-peak-forecast">-- kW</span>
+                </div>
+                <div class="quick-stat-box">
+                  <span class="quick-stat-label">Peak Hour</span>
+                  <span class="quick-stat-value" id="stat-peak-hour">--:--</span>
+                </div>
+                <div class="quick-stat-box">
+                  <span class="quick-stat-label">Average Price</span>
+                  <span class="quick-stat-value">₹8.50 / kWh</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recommendation & Alerts Grid -->
+          <div class="panel-grid-1-1">
+            <div class="panel">
+              <div class="panel-title">Smart Scheduler Recommendation</div>
+              <form id="recommendForm" onsubmit="handleGetRecommendation(event)">
+                <div class="recommend-grid">
+                  <label>
+                    Demand (kW)
+                    <input type="number" id="inDemand" value="650" required>
+                  </label>
+                  <label>
+                    Price (per kWh)
+                    <input type="number" id="inPrice" value="8.5" step="0.1" required>
+                  </label>
+                  <label>
+                    Battery SoC
+                    <input type="number" id="inSoc" value="0.50" step="0.01" min="0" max="1" required>
+                  </label>
+                </div>
+                <button type="submit" class="btn btn-primary">Get Recommendation</button>
+              </form>
+              
+              <div class="action-result-box">
+                <span class="label">Recommended Action</span>
+                <div class="action-value">
+                  <span id="actionMode" class="rec-badge hold">Hold</span>
+                  <span id="actionPower" class="rec-power">0.0 kW</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-title">Active Battery Alerts</div>
+              <div style="flex: 1; overflow-y: auto;">
+                <ul class="alert-list" id="alertList">
+                  <li class="alert-empty">No active alerts. Battery is functioning normally.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gemini AI Insights -->
+          <div class="panel" style="margin-bottom: 24px;">
+            <div class="panel-title">💡 Gemini AI Insights</div>
+            <div class="ai-insights-chat">
+              <div id="aiInsightsOutput" class="ai-output-box">
+                Loading live energy insights from Gemini AI based on forecast, battery health metrics, and savings analytics...
+              </div>
+              <form onsubmit="askGemini(event)" class="ai-input-row">
+                <input type="text" id="aiQuestion" placeholder="Ask Gemini about cost optimization or load forecasting...">
+                <button type="submit" class="btn btn-primary">Ask AI</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. PROGRESS PAGE VIEW -->
+        <div id="view-progress" class="view-panel hidden">
+          <div class="panel-grid-2-1">
+            <div class="panel">
+              <div class="panel-title">Weekly, Monthly & Yearly Progress</div>
+              <div class="progress-list">
+                <div class="progress-container">
+                  <div class="progress-header">
+                    <span>Weekly Target (Reduced consumption)</span>
+                    <span id="label-progress-weekly">57%</span>
+                  </div>
+                  <div class="progress-track">
+                    <div id="fill-progress-weekly" class="progress-fill" style="width: 57%"></div>
+                  </div>
+                </div>
+                
+                <div class="progress-container">
+                  <div class="progress-header">
+                    <span>Monthly Target (Battery utilization efficiency)</span>
+                    <span id="label-progress-monthly">42%</span>
+                  </div>
+                  <div class="progress-track">
+                    <div id="fill-progress-monthly" class="progress-fill success" style="width: 42%"></div>
+                  </div>
+                </div>
+                
+                <div class="progress-container">
+                  <div class="progress-header">
+                    <span>Yearly Target (Carbon emission reduction)</span>
+                    <span id="label-progress-yearly">20%</span>
+                  </div>
+                  <div class="progress-track">
+                    <div id="fill-progress-yearly" class="progress-fill warning" style="width: 20%"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="panel-title" style="margin-top: 10px;">Efficiency Trend</div>
+              <div class="chart-container">
+                <canvas id="efficiencyTrendChart" height="95"></canvas>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-title">Battery Health Graph</div>
+              <div class="chart-container">
+                <canvas id="batteryHealthTrendChart" height="110"></canvas>
+              </div>
+              
+              <div class="panel-title" style="margin-top: 15px; margin-bottom: 8px;">Achievements List</div>
+              <div class="achievements-grid">
+                <div class="achievement-card">
+                  <div class="achievement-badge">🥈</div>
+                  <div class="achievement-details">
+                    <span class="achievement-title">Eco-Saver Silver</span>
+                    <span class="achievement-desc">Save ₹10,000 in grid costs.</span>
+                  </div>
+                </div>
+                
+                <div class="achievement-card">
+                  <div class="achievement-badge">⚡</div>
+                  <div class="achievement-details">
+                    <span class="achievement-title">Peak Balancer</span>
+                    <span class="achievement-desc">Zero peak hours overload.</span>
+                  </div>
+                </div>
+                
+                <div class="achievement-card">
+                  <div class="achievement-badge">🔋</div>
+                  <div class="achievement-details">
+                    <span class="achievement-title">Battery Protector</span>
+                    <span class="achievement-desc">SoH kept above 90% for 30 cycles.</span>
+                  </div>
+                </div>
+
+                <div class="achievement-card">
+                  <div class="achievement-badge">🤖</div>
+                  <div class="achievement-details">
+                    <span class="achievement-title">AI Optimist</span>
+                    <span class="achievement-desc">100% action recommendations used.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. PREDICT PAGE VIEW -->
+        <div id="view-predict" class="view-panel hidden">
+          <!-- 3 cards -->
+          <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-card-title">Electricity Used</span>
+                <span class="kpi-card-icon blue">⚡</span>
+              </div>
+              <div class="kpi-card-value">1,245.8 kW</div>
+              <div class="kpi-card-subtitle">Last 24 hours consumption</div>
+            </div>
+            
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-card-title">Electricity Generated</span>
+                <span class="kpi-card-icon green">🔆</span>
+              </div>
+              <div class="kpi-card-value">340.2 kW</div>
+              <div class="kpi-card-subtitle">Solar / auxiliary source offset</div>
+            </div>
+            
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-card-title">Prediction Accuracy</span>
+                <span class="kpi-card-icon amber">🎯</span>
+              </div>
+              <div class="kpi-card-value" style="color: var(--success-text)">94.2%</div>
+              <div class="kpi-card-subtitle">XGBoost model confidence rate</div>
+            </div>
+          </div>
+
+          <div class="panel-grid-2-1">
+            <div class="panel">
+              <div class="panel-title">Upload Dataset & Generate Forecast</div>
+              
+              <div id="dropZone" class="upload-zone" ondragover="event.preventDefault(); this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleFileDrop(event)">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">Drag & Drop CSV dataset here</div>
+                <div class="upload-subtext">Supports .csv files with timestamp and demand fields</div>
+                <input type="file" id="fileInput" class="hidden" accept=".csv" onchange="handleFileSelect(event)">
+              </div>
+              
+              <div class="section-actions" style="margin-top: 16px;">
+                <button class="btn btn-primary" onclick="triggerFileSelect()">📂 Browse Upload</button>
+                <button class="btn btn-outline" onclick="loadSampleDataset()">⚡ Load Sample</button>
+              </div>
+
+              <div class="panel-title" style="margin-top: 24px;">Dataset Preview</div>
+              <div class="table-container">
+                <table class="data-table" id="datasetTable">
+                  <thead>
+                    <tr>
+                      <th>Timestamp</th>
+                      <th>Electricity Demand (kW)</th>
+                      <th>Production Vol</th>
+                      <th>Temp (°C)</th>
+                      <th>Price (₹/kWh)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colspan="5" style="text-align: center; color: var(--text-muted);">No dataset loaded. Drag & drop or click "Load Sample" to visualize.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-title">Dataset Statistics</div>
+              <div class="quick-stats-grid" id="dataset-stats-grid" style="margin-bottom: 20px;">
+                <div class="quick-stat-box">
+                  <span class="quick-stat-label">Total Records</span>
+                  <span class="quick-stat-value" id="stat-records-count">-</span>
+                </div>
+                <div class="quick-stat-box">
+                  <span class="quick-stat-label">Mean Demand</span>
+                  <span class="quick-stat-value" id="stat-mean-demand">-</span>
+                </div>
+                <div class="quick-stat-box">
+                  <span class="quick-stat-label">Peak Demand</span>
+                  <span class="quick-stat-value" id="stat-peak-demand">-</span>
+                </div>
+                <div class="quick-stat-box">
+                  <span class="quick-stat-label">Standard Dev</span>
+                  <span class="quick-stat-value" id="stat-std-demand">-</span>
+                </div>
+              </div>
+
+              <div class="panel-title">AI Smart Recommendations</div>
+              <div class="ai-output-box" id="predictSmartRecs" style="max-height: 250px; background-color: var(--panel); border: 1px solid var(--panel-border); color: var(--text);">
+                Awaiting dataset upload to process load curve anomalies and forecast optimization recommendation vectors...
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. COST ANALYSIS VIEW -->
+        <div id="view-cost" class="view-panel hidden">
+          <!-- 4 KPIs -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-card-title">Energy Reduced</span>
+                <span class="kpi-card-icon green">⚡</span>
+              </div>
+              <div class="kpi-card-value">1,450 kWh</div>
+              <div class="kpi-card-subtitle">Peak load shifted off-grid</div>
+            </div>
+            
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-card-title">Before Cost</span>
+                <span class="kpi-card-icon red">₹</span>
+              </div>
+              <div class="kpi-card-value" id="cost-before">₹1,50,000</div>
+              <div class="kpi-card-subtitle">Unoptimized baseline grid expense</div>
+            </div>
+            
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-card-title">After Cost</span>
+                <span class="kpi-card-icon blue">₹</span>
+              </div>
+              <div class="kpi-card-value" id="cost-after">₹1,20,000</div>
+              <div class="kpi-card-subtitle">RL-optimized system cost</div>
+            </div>
+            
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-card-title">Savings</span>
+                <span class="kpi-card-icon green">💰</span>
+              </div>
+              <div class="kpi-card-value" style="color: var(--success-text);" id="cost-savings">₹30,000</div>
+              <div class="kpi-card-subtitle" id="cost-savings-pct">20.0% Saved</div>
+            </div>
+          </div>
+
+          <div class="panel-grid-2-1">
+            <div class="panel">
+              <div class="panel-title">Daily Grid Cost Comparison</div>
+              <div class="chart-container">
+                <canvas id="dailyCostChart" height="110"></canvas>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-title">Savings Distribution Chart</div>
+              <div class="chart-container">
+                <canvas id="savingsComparisonChart" height="110"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-bottom: 24px;">
+            <div class="panel-title">Cost Optimization Tips</div>
+            <ul class="alert-list" style="gap: 12px;">
+              <li class="alert-item" style="background-color: var(--panel);">
+                <div class="alert-item-info">
+                  <strong style="color: var(--primary);">Tip 1: Exploit Time-of-Use tariff structure</strong>
+                  <span style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">Configure the PPO scheduler to increase charge rates between 02:00 AM and 05:00 AM, where prices drop to minimums.</span>
+                </div>
+              </li>
+              <li class="alert-item" style="background-color: var(--panel);">
+                <div class="alert-item-info">
+                  <strong style="color: var(--success-text);">Tip 2: Solar generation overlap</strong>
+                  <span style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">Charge the battery directly with solar energy offsets between 11:00 AM and 02:00 PM, avoiding grid conversion losses.</span>
+                </div>
+              </li>
+              <li class="alert-item" style="background-color: var(--panel);">
+                <div class="alert-item-info">
+                  <strong style="color: var(--warning-text);">Tip 3: Mitigate deep discharge cycles</strong>
+                  <span style="color: var(--text-muted); font-size: 12px; margin-top: 4px;">Discharging below 15% SoC during high demand spikes reduces State of Health (SoH) by an extra 0.05% per cycle. Limit maximum depth of discharge under battery configurations.</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 8. BATTERY PAGE VIEW -->
+        <div id="view-battery" class="view-panel hidden">
+          <!-- 3 KPIs -->
+          <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-card-title">Energy Used</span>
+                <span class="kpi-card-icon blue">⚡</span>
+              </div>
+              <div class="kpi-card-value" id="battery-energy-used">-- kWh</div>
+              <div class="kpi-card-subtitle">Lifetime cycled throughput</div>
+            </div>
+            
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-card-title">Battery Charge</span>
+                <span class="kpi-card-icon green">🔋</span>
+              </div>
+              <div class="kpi-card-value" id="battery-charge">--%</div>
+              <div class="kpi-card-subtitle">State of Charge (SoC)</div>
+            </div>
+            
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-card-title">Remaining Life</span>
+                <span class="kpi-card-icon red">⏳</span>
+              </div>
+              <div class="kpi-card-value" id="battery-life">-- cycles</div>
+              <div class="kpi-card-subtitle">Predicted RUL cycles</div>
+            </div>
+          </div>
+
+          <div class="panel-grid-1-1">
+            <div class="panel">
+              <div class="panel-title">Battery Specifications</div>
+              <div class="table-container" style="max-height: none;">
+                <table class="data-table">
+                  <tbody>
+                    <tr>
+                      <th>Battery ID</th>
+                      <td id="spec-id">--</td>
+                    </tr>
+                    <tr>
+                      <th>Chemistry</th>
+                      <td>Lithium Iron Phosphate (LiFePO4)</td>
+                    </tr>
+                    <tr>
+                      <th>Nominal Capacity</th>
+                      <td id="spec-nominal-capacity">-- kWh</td>
+                    </tr>
+                    <tr>
+                      <th>State of Health (SoH)</th>
+                      <td id="spec-soh" style="font-weight: 700;">--%</td>
+                    </tr>
+                    <tr>
+                      <th>Usable Capacity</th>
+                      <td id="spec-usable-capacity">-- kWh</td>
+                    </tr>
+                    <tr>
+                      <th>Standard cycle life</th>
+                      <td>3,000 Cycles</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-title">Battery Health Metrics</div>
+              <div class="quick-stats-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="quick-stat-box">
+                  <span class="quick-stat-label">Pack Voltage</span>
+                  <span class="quick-stat-value" id="spec-voltage">-- V</span>
+                </div>
+                <div class="quick-stat-box">
+                  <span class="quick-stat-label">Cell Variance</span>
+                  <span class="quick-stat-value">4.2 mV</span>
+                </div>
+                <div class="quick-stat-box">
+                  <span class="quick-stat-label">Internal Temp</span>
+                  <span class="quick-stat-value">28.5 °C</span>
+                </div>
+                <div class="quick-stat-box">
+                  <span class="quick-stat-label">Status Code</span>
+                  <span class="quick-stat-value" id="spec-fault">NORMAL</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-bottom: 24px;">
+            <div class="panel-title">Battery Monitoring Recommendations</div>
+            <div class="ai-output-box" id="batteryRecommendationsText" style="background-color: var(--panel); border: 1px solid var(--panel-border); color: var(--text);">
+              Loading battery cell monitoring insights...
+            </div>
+          </div>
+        </div>
+
+        <!-- 9. SETTINGS PAGE VIEW -->
+        <div id="view-settings" class="view-panel hidden">
+          <div class="panel">
+            <div class="panel-title">System Settings</div>
+            
+            <form id="settingsForm" class="settings-form" onsubmit="handleSaveSettings(event)">
+              
+              <!-- Profile picture section -->
+              <div class="profile-upload-section">
+                <div id="settingsProfileAvatar" class="profile-avatar-large">US</div>
+                <div>
+                  <label for="settingsProfileInput" class="btn btn-outline" style="cursor: pointer;">
+                    📷 Upload Photo
+                  </label>
+                  <input type="file" id="settingsProfileInput" accept="image/*" class="hidden" onchange="handleProfileUpload(event)">
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">JPG, PNG or WEBP formats. Size limits: 2MB.</div>
+                </div>
+              </div>
+              
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="settingsName">Full Name</label>
+                  <input type="text" id="settingsName" required>
+                </div>
+                <div class="form-group">
+                  <label for="settingsEmail">Email Address</label>
+                  <input type="email" id="settingsEmail" required>
+                </div>
+                <div class="form-group">
+                  <label for="settingsUserId">User ID</label>
+                  <input type="text" id="settingsUserId" disabled value="USR-2026-99">
+                </div>
+                <div class="form-group">
+                  <label for="settingsRole">Role</label>
+                  <input type="text" id="settingsRole" disabled value="Energy Administrator">
+                </div>
+              </div>
+              
+              <div class="panel-title" style="margin-top: 15px; margin-bottom: 8px;">Notification Preferences</div>
+              <div class="form-grid-2">
+                <div class="preference-group">
+                  <div class="preference-item">
+                    <div class="preference-info">
+                      <span class="preference-title">Email Notifications</span>
+                      <span class="preference-desc">Receive reports and summaries.</span>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox" id="prefEmail" checked>
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                  
+                  <div class="preference-item">
+                    <div class="preference-info">
+                      <span class="preference-title">Push Alerts</span>
+                      <span class="preference-desc">Alerts for cell variance and temperature anomalies.</span>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox" id="prefPush" checked>
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+                
+                <div class="preference-group">
+                  <div class="preference-item">
+                    <div class="preference-info">
+                      <span class="preference-title">SMS Escalation</span>
+                      <span class="preference-desc">Critical alerts pushed via SMS API gateway.</span>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox" id="prefSMS">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="panel-title" style="margin-top: 15px; margin-bottom: 8px;">Preferences & Customizations</div>
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="prefTheme">Theme Mode</label>
+                  <select id="prefTheme" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--panel-border); background: var(--panel);">
+                    <option value="white">White Theme (Recommended)</option>
+                    <option value="dark">Dark Theme</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="prefLayout">Dashboard Layout</label>
+                  <select id="prefLayout" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--panel-border); background: var(--panel);">
+                    <option value="grid">Grid View</option>
+                    <option value="compact">Compact View</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="prefSound">Notification Sound</label>
+                  <select id="prefSound" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--panel-border); background: var(--panel);">
+                    <option value="chime">Chime sound</option>
+                    <option value="none">Mute</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="panel-title" style="margin-top: 15px; margin-bottom: 8px;">Change Password</div>
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="settingsOldPass">Old Password</label>
+                  <input type="password" id="settingsOldPass" placeholder="Enter old password">
+                </div>
+                <div class="form-group">
+                  <label for="settingsNewPass">New Password</label>
+                  <input type="password" id="settingsNewPass" placeholder="Enter new password">
+                </div>
+              </div>
+              
+              <button type="submit" class="btn btn-primary" style="align-self: flex-start; margin-top: 10px;">SAVE CHANGES</button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ================= 10. LOGOUT MODAL OVERLAY ================= -->
+  <div id="logoutModal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-title">Logout Confirmation</div>
+      <div class="modal-message">Are you sure want to logout of SYRAX Energy Management System?</div>
+      <div class="modal-buttons">
+        <button class="btn btn-primary" onclick="confirmLogout()">YES</button>
+        <button class="btn btn-outline" onclick="closeLogoutModal()">NO</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

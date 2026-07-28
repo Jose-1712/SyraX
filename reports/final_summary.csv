@@ -1,0 +1,9 @@
+,0
+xgboost_test_mae,23.071597414665206
+xgboost_test_rmse,28.802787102555673
+xgboost_test_mape,4.35060232903735
+xgboost_test_r2,0.9868624997121999
+baseline_electricity_cost,11064925.543418884
+rl_optimized_cost,10989169.292259216
+absolute_savings,75756.25115966797
+percentage_savings,0.6846521547967009
