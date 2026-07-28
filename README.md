@@ -172,3 +172,4 @@ tunnel so you get a public URL to open in a browser.
 - The dashboard (`frontend/`) is plain HTML/CSS/JS (Chart.js via CDN) so it
   can be embedded in Power BI/other tools or replaced entirely; the API is
   the real integration surface.
+## final summary
