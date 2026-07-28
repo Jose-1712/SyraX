@@ -18,6 +18,7 @@ Run:
 
 Note: database calls are wrapped in try/except so the API keeps working
 (model-only mode) even if MySQL isn't configured/running yet.
+
 """
 
 import os
