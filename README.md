@@ -140,19 +140,14 @@ curl -X POST http://localhost:5000/api/ai/insights \
 Never put the key in frontend JavaScript or commit `.env` — `.gitignore`
 already excludes it.
 
-## Running on Google Colab (connected to GitHub)
+## Running in Visual Studio Code
 
-`colab_run.ipynb` clones this repo from GitHub, installs dependencies, loads
-`GEMINI_API_KEY` from **Colab's Secrets panel** (key icon in the left
-sidebar — not typed into a cell), and serves the app through an ngrok
-tunnel so you get a public URL to open in a browser.
-
-1. Push this project to a GitHub repo.
-2. Open `colab_run.ipynb` in Colab, edit `REPO_URL` at the top to your repo.
-3. Add secrets in Colab: `GEMINI_API_KEY` (required), `NGROK_AUTHTOKEN`
-   (optional, for the public tunnel — free at https://ngrok.com).
-4. Run all cells. The last cell pushes any changes back to GitHub using a
-   Personal Access Token entered via `getpass` (never saved in the notebook).
+- Opened the project folder in Visual Studio Code.
+- Opened the integrated terminal.
+- Installed the required dependencies using `pip install -r requirements.txt`.
+- Configured the `GEMINI_API_KEY` in the `.env` file.
+- Ran the application using `python app.py`.
+- Accessed the application through the local URL displayed in the terminal.
 
 ## Security notes
 
