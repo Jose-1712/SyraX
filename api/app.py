@@ -30,6 +30,7 @@ from flask import Flask, jsonify, request, render_template
 load_dotenv()  # reads .env if present; no-op if it doesn't exist (e.g. Colab secrets used instead)
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+#from the models we are importing predict and rl agent
 from models import predict as predict_mod
 from models import rl_agent
 from api import gemini_service
