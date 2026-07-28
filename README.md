@@ -1,4 +1,4 @@
-# AI Energy Management — Backend
+# AI Energy Management 
 
 Predicts an industrial plant's electricity demand, forecasts cost, and
 schedules a battery (charge during low-price/low-demand hours, discharge
