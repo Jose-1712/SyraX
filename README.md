@@ -106,6 +106,14 @@ Open http://localhost:5000 for the dashboard, or call the API directly:
 | GET    | `/api/alerts`                | open battery-fault alerts                 |
 | POST   | `/api/data/ingest`           | ingest a new hourly meter reading         |
 
+Deployment
+
+The AI Energy Management System is deployed on the Render cloud platform and can be accessed through the following public URL:
+
+Deployment URL : https://syrax-10u3.onrender.com
+
+The deployed application includes electricity demand forecasting, battery health monitoring, battery scheduling recommendations, cost analysis, and Gemini AI-powered insights.
+
 ## Notes on the two datasets
 
 - `raw_energy_data.csv` — hourly plant-level demand, production, weather,
