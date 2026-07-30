@@ -6,6 +6,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: Render
+      url: https://syrax-10u3.onrender.com
     steps:
       - name: Trigger Render Deploy Hook
         run: |
