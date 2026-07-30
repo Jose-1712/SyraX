@@ -106,7 +106,7 @@ Open http://localhost:5000 for the dashboard, or call the API directly:
 | GET    | `/api/alerts`                | open battery-fault alerts                 |
 | POST   | `/api/data/ingest`           | ingest a new hourly meter reading         |
 
-**Deployment**
+## Deployment
 
 The AI Energy Management System is deployed on the Render cloud platform and can be accessed through the following public URL:
 
