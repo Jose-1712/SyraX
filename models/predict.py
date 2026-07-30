@@ -30,7 +30,7 @@ MODELS_DIR = os.path.dirname(os.path.abspath(__file__))
 _cache = {}
 
 
-def _load_demand_model() -> xgb.XGBRegressor:
+def _load_demand_model() -> xgb.XGBRegressor: # Creates a function to load the trained XGBoost demand forecasting model
     if "demand_model" not in _cache:
         model = xgb.XGBRegressor()
         model.load_model(os.path.join(MODELS_DIR, "xgb_demand_model.json"))
