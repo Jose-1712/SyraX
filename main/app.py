@@ -13,7 +13,7 @@ Endpoints:
     POST /api/data/ingest                - ingest a new hourly reading
 
 Run:
-    python api/app.py
+    python main/app.py
     (serves on http://localhost:5000, and also serves frontend/templates/index.html)
 
 Note: database calls are wrapped in try/except so the API keeps working
@@ -33,7 +33,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 #from the models we are importing predict and rl agent
 from models import predict as predict_mod
 from models import rl_agent
-from api import gemini_service
+from main import gemini_service
 
 FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
 

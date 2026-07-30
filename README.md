@@ -40,7 +40,7 @@ AI-Energy-Management/
 ├── database/
 │   ├── schema.sql                   # MySQL schema
 │   └── mysql_connection.py          # connection pool + insert/fetch helpers
-├── api/
+├── main/
 │   └── app.py                       # Flask REST API + serves the dashboard
 ├── frontend/
 │   ├── templates/index.html
@@ -91,7 +91,7 @@ savings before deploying.
 ## Running the API + dashboard
 
 ```bash
-python api/app.py
+python main/app.py
 ```
 
 Open http://localhost:5000 for the dashboard, or call the API directly:
@@ -170,7 +170,7 @@ already excludes it.
 
 - Swap `BATTERY_CAPACITY_KWH` / `MAX_CHARGE_RATE_KW` in `models/rl_agent.py`
   to match your real installed battery.
-- `api/app.py`'s `/api/data/ingest` endpoint is the hook for a live
+- `main/app.py`'s `/api/data/ingest` endpoint is the hook for a live
   SCADA/meter feed — point your data-collection service at it.
 - The dashboard (`frontend/`) is plain HTML/CSS/JS (Chart.js via CDN) so it
   can be embedded in Power BI/other tools or replaced entirely; the API is

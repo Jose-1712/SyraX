@@ -19,8 +19,8 @@ COPY . .
 EXPOSE 5000
 
 # Set environment variables
-ENV FLASK_APP=api/app.py
+ENV FLASK_APP=main/app.py
 ENV PYTHONUNBUFFERED=1
 
 # Start the Flask app using Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "api.app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "main.app:app"]
