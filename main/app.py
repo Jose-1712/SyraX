@@ -27,14 +27,14 @@ import sys
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request, render_template
 
-load_dotenv()  # reads .env if present; no-op if it doesn't exist (e.g. Colab secrets used instead)
+load_dotenv()  # reads .env if present
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 #from the models we are importing predict and rl agent
 from models import predict as predict_mod
 from models import rl_agent
 from main import gemini_service
-
+#frontend connection
 FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
 
 app = Flask(
@@ -42,8 +42,7 @@ app = Flask(
     template_folder=os.path.join(FRONTEND_DIR, "templates"),
     static_folder=os.path.join(FRONTEND_DIR, "static"),
 )
-
-
+#Database Wrapper
 def _try_db(fn, *args, **kwargs):
     """Best-effort DB call: log and continue if MySQL isn't reachable."""
     try:
@@ -68,6 +67,7 @@ def health():
 def predict_demand():
     hours = int(request.args.get("hours", 24))
     hours = max(1, min(hours, 168))
+    #call ML model
     forecast = predict_mod.forecast_demand(horizon_hours=hours)
 
     _try_db(lambda db: db.insert_demand_predictions(forecast))
