@@ -81,7 +81,7 @@ def main(tune: bool = False, data_path: str = None):
 
     if tune:
         print("Running randomized hyperparameter search (this may take a while)...")
-        base = xgb.XGBRegressor(objective="reg:squarederror", random_state=42, n_jobs=-1)
+        base = xgb.XGBRegressor(objective="reg:squarederror", random_state=42, n_jobs=-1) # Creating XGBoost regression model 
         search = RandomizedSearchCV(
             base, SEARCH_SPACE, n_iter=25, cv=3,
             scoring="neg_mean_absolute_error", random_state=42, n_jobs=-1, verbose=1,
@@ -92,16 +92,16 @@ def main(tune: bool = False, data_path: str = None):
         print("Best params:", best_params)
     else:
         best_params = DEFAULT_PARAMS
-        model = xgb.XGBRegressor(**best_params)
+        model = xgb.XGBRegressor(**best_params) # Creating final XGBoost demand forecasting model
         model.fit(X_train, y_train)
 
-    y_pred = model.predict(X_test)
+    y_pred = model.predict(X_test) # Predicting electricity demand using trained XGBoost model
     metrics = evaluate(y_test.values, y_pred)
     metrics["best_params"] = best_params
     print("Test metrics:", {k: v for k, v in metrics.items() if k != "best_params"})
 
     # Save artifacts
-    model.save_model(os.path.join(MODELS_DIR, "xgb_demand_model.json"))
+    model.save_model(os.path.join(MODELS_DIR, "xgb_demand_model.json")) # Saving trained XGBoost model for future prediction
 
     with open(os.path.join(MODELS_DIR, "feature_columns.pkl"), "wb") as f:
         pickle.dump(FEATURE_COLUMNS, f)
